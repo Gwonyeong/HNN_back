@@ -28,5 +28,6 @@ class App {
         this.app.use(error404);
         this.app.use(error);
     }
+    
 }
 module.exports = new App().app;
