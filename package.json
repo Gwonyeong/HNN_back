@@ -4,7 +4,8 @@
     "description": "항해99 8기 F반 2조 (Node.js) 팀과제",
     "main": "app.js",
     "scripts": {
-        "test": "jest"
+        "test": "jest",
+        "start": "nodemon server.js"
     },
     "repository": {
         "type": "git",
@@ -21,8 +22,10 @@
         "cookie-parser": "^1.4.6",
         "dotenv": "^16.0.1",
         "express": "^4.18.1",
+        "joi": "^17.6.0",
         "jsonwebtoken": "^8.5.1",
         "mysql2": "^2.3.3",
+        "nodemon": "^2.0.19",
         "sequelize": "^6.21.3",
         "socket.io": "^4.5.1"
     },
