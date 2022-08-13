@@ -8,9 +8,6 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.INTEGER,
             },
-            userId: {
-                type: Sequelize.INTEGER,
-            },
             title: {
                 type: Sequelize.STRING,
             },
@@ -19,6 +16,15 @@ module.exports = {
             },
             imageUrl: {
                 type: Sequelize.STRING,
+            },
+            songTitle: {
+                type: Sequelize.STRING,
+            },
+            singer: {
+                type: Sequelize.STRING,
+            },
+            userId: {
+                type: Sequelize.INTEGER,
             },
             MBTI: {
                 type: Sequelize.STRING,
