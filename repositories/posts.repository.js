@@ -22,17 +22,25 @@ class PostRepository {
         return detailPost;
     };
 
-    // createPost = async (nickname, pw, title, content, userId, songTitle, singer) => {
-    createPost = async (title, content, imageUrl) => {
+    createPost = async (
+        nickname,
+        pw,
+        title,
+        content,
+        userId,
+        songTitle,
+        singer
+    ) => {
+        // createPost = async (title, content, imageUrl) => {
         // ORM인 Sequelize에서 Posts 모델의 create 메소드를 사용해 데이터를 요청합니다.
         const createPostData = await Post.create({
             title,
             content,
             imageUrl,
-            // like: 0,
-            // userId,
-            // songTitle,
-            // singer,
+            like: 0,
+            userId,
+            songTitle,
+            singer,
         });
         console.log("repo", createPostData);
 
