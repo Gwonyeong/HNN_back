@@ -1,3 +1,4 @@
+
 const PostService = require("../services/posts.service");
 // const requireLogin = require("../middlewares/auth-middleware");
 
@@ -58,6 +59,7 @@ class PostsController {
 
         const deletPostData = await this.postService.deletePost(Number(postId));
         res.status(deletPostData.status).json({ data: deletPostData });
+
     };
 }
 

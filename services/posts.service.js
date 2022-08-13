@@ -1,7 +1,8 @@
-const PostRepository = require("../repositories/posts.repository");
+
 
 class PostService {
     postRepository = new PostRepository();
+
 
     findAllPost = async () => {
         const allPost = await this.postRepository.findAllPost();
@@ -73,6 +74,7 @@ class PostService {
     deletePost = async (postId) => {
         await this.postRepository.deletePost(postId);
         return { status: 200, msg: "게시물 삭제에 성공했습니다." };
+
     };
 }
 
