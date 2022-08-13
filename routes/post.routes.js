@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 // const authMiddleware = require("../middlewares/auth-middleware");
 
-const PostsController = require("../controller/posts.controller");
+const PostsController = require("../controllers/posts.controller");
 const postsController = new PostsController();
 
 // 게시물 조회
