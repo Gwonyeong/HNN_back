@@ -22,14 +22,14 @@ class PostsController {
     //게시글 생성
     createPost = async (req, res, next) => {
         const { title, content, imageUrl, songTitle, singer } = req.body;
-        // const { nickname, userId } = res.locals;
+        const { nickname, userId } = res.locals;
         console.log(title);
 
         const createPostData = await this.postService.createPost(
-            // nickname,
+            nickname,
             title,
             content,
-            // userId,
+            userId,
             songTitle,
             singer
         );

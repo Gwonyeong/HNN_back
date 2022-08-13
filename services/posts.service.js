@@ -10,17 +10,17 @@ class PostService {
         const Posts = allPost.posts.map((post, idx) => {
             return {
                 postId: post.postId,
-                // nickname: post.nickname,
+                nickname: post.nickname,
                 title: post.title,
                 content: post.content,
-                // profilePicture: post.profilePicture,
-                // MBTI: post.MBTI,
+                profilePicture: post.profilePicture,
+                MBTI: post.MBTI,
                 createdAt: post.createdAt,
-                // like: allPost.like[idx],
-                // comment: post.comment,
+                like: allPost.like[idx],
+                comment: post.comment,
             };
         });
-
+        console.log(allPost);
         Posts.sort((a, b) => {
             return b.createdAt - a.createdAt;
         });
@@ -48,13 +48,8 @@ class PostService {
     };
 
     // createPost = async (nickname, pw, title, content, userId) => {
-    createPost = async (title, content, imageUrl) => {
-        await this.postRepository.createPost(
-            title,
-            content,
-            imageUrl
-            // userId
-        );
+    createPost = async (title, content, imageUrl, userId) => {
+        await this.postRepository.createPost(title, content, imageUrl, userId);
 
         return {
             status: 200,
