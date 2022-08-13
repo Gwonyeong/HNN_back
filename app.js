@@ -5,9 +5,6 @@ const indexRouter = require("./routes");
 const { error404, error } = require("./middlewares/error");
 const cors = require("cors");
 
-const app = express();
-app.use(express.json);
-
 class App {
     constructor() {
         this.app = express();
@@ -28,6 +25,5 @@ class App {
         this.app.use(error404);
         this.app.use(error);
     }
-    
 }
 module.exports = new App().app;
