@@ -6,7 +6,12 @@ const { error404, error } = require("./middlewares/error");
 const cors = require("cors");
 
 const app = express();
-app.use(express.json);
+const port = 3000;
+// app.use(express.json);
+
+app.listen(port, () => {
+    console.log(port, "서버켜짐!");
+});
 
 class App {
     constructor() {
