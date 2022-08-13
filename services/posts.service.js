@@ -1,27 +1,80 @@
-const PostRepository = require("../repository/posts.repository");
+
 
 class PostService {
     postRepository = new PostRepository();
 
-    getPostAll = async () => {
-        const allpost = await this.postRepository.findAllPost();
 
-        let posts = [];
-        for (i in allpost) {
-            const post = allpost[i].dataValues;
-            const likes = await this.postRepository.findLikesNum(post.postId);
-            const postInfo = {
+    findAllPost = async () => {
+        const allPost = await this.postRepository.findAllPost();
+
+        const Posts = allPost.posts.map((post, idx) => {
+            return {
+                postId: post.postId,
+                // nickname: post.nickname,
                 title: post.title,
                 content: post.content,
-                nickname: post.nickname,
-                profilePicture: post.profilePicture,
-                MBTI: post.MBTI,
+                // profilePicture: post.profilePicture,
+                // MBTI: post.MBTI,
                 createdAt: post.createdAt,
-                likes,
+                // like: allPost.like[idx],
+                // comment: post.comment,
             };
-            posts.push(postInfo);
-        }
-        return posts;
+        });
+
+        Posts.sort((a, b) => {
+            return b.createdAt - a.createdAt;
+        });
+
+        return {
+            Posts,
+            status: 200,
+        };
+    };
+
+    getPost = async (postId) => {
+        const getPostData = await this.postRepository.findOnePost(postId);
+
+        const Post = {
+            nickname: getPostData.nickname,
+            title: getPostData.title,
+            content: getPostData.content,
+            createdAt: getPostData.createdAt,
+            // like: getPostData.like,
+        };
+        return {
+            Post,
+            status: 200,
+        };
+    };
+
+    // createPost = async (nickname, pw, title, content, userId) => {
+    createPost = async (title, content, imageUrl) => {
+        await this.postRepository.createPost(
+            title,
+            content,
+            imageUrl
+            // userId
+        );
+
+        return {
+            status: 200,
+            msg: "게시물이 생성되었습니다!",
+        };
+        console.log("service", createPost);
+    };
+
+    updatePost = async (postId, title, content, imageUrl) => {
+        await this.postRepository.updatePost(postId, title, content, imageUrl);
+        return {
+            status: 200,
+            msg: "게시물이 수정되었습니다.",
+        };
+    };
+
+    deletePost = async (postId) => {
+        await this.postRepository.deletePost(postId);
+        return { status: 200, msg: "게시물 삭제에 성공했습니다." };
+
     };
 }
 
