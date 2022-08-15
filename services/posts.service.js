@@ -1,5 +1,3 @@
-const PostRepository = require("../repositories/posts.repository");
-const { all } = require("../routes/post.routes");
 
 
 class PostService {
