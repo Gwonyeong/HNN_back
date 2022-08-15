@@ -1,8 +1,7 @@
-
+const PostRepository = require("../repositories/posts.repository");
 
 class PostService {
     postRepository = new PostRepository();
-
 
     findAllPost = async () => {
         const allPost = await this.postRepository.findAllPost();
@@ -57,12 +56,12 @@ class PostService {
             },
 
             commenter: {
-                nickname: getPostData.detailPostUser["User.nickname"],
-                content: getPostData.detailPostUser.content,
+                nickname: getPostData.detailCommentUser["User.nickname"],
+                content: getPostData.detailCommentUser.content,
                 profilePicture:
-                    getPostData.detailPostUser["User.profilePicture"],
-                MTBI: getPostData.detailPostUser["User.MBTI"],
-                createdAt: getPostData.detailPostUser.createdAt,
+                    getPostData.detailCommentUser["User.profilePicture"],
+                MTBI: getPostData.detailCommentUser["User.MBTI"],
+                createdAt: getPostData.detailCommentUser.createdAt,
             },
         };
 
@@ -117,7 +116,6 @@ class PostService {
     deletePost = async (postId) => {
         await this.postRepository.deletePost(postId);
         return { msg: "게시물 삭제에 성공했습니다." };
-
     };
 }
 

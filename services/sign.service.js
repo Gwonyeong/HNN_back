@@ -7,7 +7,7 @@ const env = process.env;
 
 class SignService {
     signRepository = new SignRepository();
-//로그인
+    //로그인
     //정확한 email, password를 입력시 return {token, success : true}
     //그렇지 않으면  return {success : false, msg : "회원 정보가 일치하지 않습니다."}
     login = async (email, password) => {
@@ -25,7 +25,6 @@ class SignService {
             const token = jwt.sign(
                 {
                     userId: userData.userId,
-                    
                 },
                 env.secretKey
             );
@@ -59,7 +58,7 @@ class SignService {
         }
     };
 
-//이메일
+    //이메일
     //이메일 확인 : 이메일로 데이터베이스를 찾아 중복된 이메일이 있으면
     // {sucess :  true , msg : "이미 존재하는 이메일입니다."} ,
     // 없으면 {success : false , msg : "사용할 수 있는 이메일입니다."}
@@ -100,7 +99,7 @@ class SignService {
         return { success: true };
     };
 
-//닉네임
+    //닉네임
     //중복 닉네임 확인 : 데이터베이스에 중복된 닉네임이 있는지 확인
     // 있으면 return {success : true}
     // 없으면 return {success : false}
@@ -149,7 +148,7 @@ class SignService {
         }
     };
 
-//비밀번호
+    //비밀번호
     //password와 confirmPw가 같은지 확인.
     //같다면   return {success : true}
     //다르다면 return {success : false}
@@ -199,10 +198,7 @@ class SignService {
         }
         return { success: true };
     };
-    
-    
 
-    
     //password를 받아 해쉬화된 비밀번호로 반환
     changePasswordToHash = (password) => {
         return crypto
@@ -212,9 +208,9 @@ class SignService {
     };
 }
 
-class UserService extends SignService{
+class UserService extends SignService {
     signRepository = new SignRepository();
-    
+
     //userId로 받아온 유저의 password 가 password와 같다면 true
     //다르면 false
     checkPassword = async (userId, password) => {
@@ -226,11 +222,23 @@ class UserService extends SignService{
     };
 
     //사용자에게 새로받은 4개의 정보로 업데이트
-    updateUserProfile = async (userId,password,nickname,MBTI,profilePicture) => {
-        password =super.changePasswordToHash(password)
-        updateUserProfileData =await this.signRepository.updateUserProfile(userId,password,nickname,MBTI,profilePicture);
-        return { success : true}
-    }
+    updateUserProfile = async (
+        userId,
+        password,
+        nickname,
+        MBTI,
+        profilePicture
+    ) => {
+        password = super.changePasswordToHash(password);
+        updateUserProfileData = await this.signRepository.updateUserProfile(
+            userId,
+            password,
+            nickname,
+            MBTI,
+            profilePicture
+        );
+        return { success: true };
+    };
 }
 module.exports = {
     SignService,
