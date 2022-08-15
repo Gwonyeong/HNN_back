@@ -1,41 +1,85 @@
-const { Like, Post } = require("../models");
+const { Like, Post, User, Comment } = require("../models");
+const PostService = require("../services/posts.service");
+const SignRepository = require("../repositories/sign.repository");
 
 class PostRepository {
     findAllPost = async () => {
         const posts = await Post.findAll();
-        // const like = [];
+        const Locals = [];
 
-        // for (let i = 0; i < posts.length; i++) {
-        //     const temp = await Like.findAll({
-        //         where: { postId: posts[i].postId },
-        //     });
-        //     like.push(temp.length);
-        // }
-        // return { posts, like };
-        return posts;
+        for (let i = 0; i < posts.length; i++) {
+            const locals = await User.findOne({
+                where: { userId: posts[i].userId },
+            }); //locals에는 posts.userId로 찾은 user 데이터가 담겨있다.
+            Locals.push(locals);
+        }
+        return { posts, Locals };
     };
+
+    // const like = [];
+    // for (let i = 0; i < posts.length; i++) {
+    //     const temp = await Like.findAll({
+    //         where: { postId: posts[i].postId },
+    //     });
+    //     like.push(temp.length);
+    // }
+    // return { posts, like };
+    // };
 
     findOnePost = async (postId) => {
-        const detailPost = await Post.findOne({
+        //join 사용해서
+        const detailPostUser = await Post.findOne({
             where: { postId },
+            include: [
+                {
+                    model: User,
+                    attributes: ["MBTI", "profilePicture", "nickname"],
+                },
+                {
+                    model: Comment,
+                    attributes: ["content", "createdAt"],
+                },
+            ],
+            attributes: [
+                "title",
+                "content",
+                "userId",
+                "songTitle",
+                "singer",
+                "createdAt",
+                "imageUrl",
+            ],
+            raw: true,
         });
-        return detailPost;
+
+        // await Post.userId.findOne(
+        //     { MBTI, profilePicture, nickname },
+        //     { where: userId }
+        // );
+
+        return { detailPostUser };
     };
 
-    // createPost = async (nickname, pw, title, content, userId, songTitle, singer) => {
-    createPost = async (title, content, imageUrl) => {
+    createPost = async (
+        title,
+        content,
+        imageUrl,
+        songTitle,
+        singer,
+        userId,
+        MBTI
+    ) => {
+        // createPost = async (title, content, imageUrl) => {
         // ORM인 Sequelize에서 Posts 모델의 create 메소드를 사용해 데이터를 요청합니다.
         const createPostData = await Post.create({
             title,
             content,
             imageUrl,
-            // like: 0,
-            // userId,
-            // songTitle,
-            // singer,
+            songTitle,
+            singer,
+            userId,
+            MBTI,
         });
-        console.log("repo", createPostData);
-
         return createPostData;
     };
 

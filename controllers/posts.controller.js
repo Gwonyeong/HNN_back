@@ -8,33 +8,38 @@ class PostsController {
     //전체 게시물 조회, 상세페이지
     getAllPosts = async (req, res, next) => {
         const postsData = await this.postService.findAllPost();
-        res.status(postsData.status).json({ data: postsData.Posts });
+        res.json({ data: postsData.Posts });
     };
 
     //상세 게시물 조회
     getOnePost = async (req, res, next) => {
         const { postId } = req.params;
-        const postData = await this.postService.getPost(Number(postId));
 
-        res.status(postData.status).json({ data: postData.Post });
+        const postData = await this.postService.getPost(Number(postId));
+        // const infoData = await this.postService.getPost(songTitle, singer);
+        // const commentData = await this.postService.getPost()
+
+        res.json({
+            data: postData.Poster,
+            // data: infoData.Post,
+        });
     };
 
     //게시글 생성
     createPost = async (req, res, next) => {
         const { title, content, imageUrl, songTitle, singer } = req.body;
-        // const { nickname, userId } = res.locals;
-        console.log(title);
+        const { userId, MBTI } = res.locals;
 
         const createPostData = await this.postService.createPost(
-            // nickname,
             title,
             content,
-            // userId,
+            imageUrl,
             songTitle,
-            singer
+            singer,
+            userId,
+            MBTI
         );
-        console.log("controller", createPostData);
-        res.status(createPostData.status).json({ data: createPostData.msg });
+        res.json({ data: createPostData.msg });
     };
 
     //게시글 수정
@@ -49,16 +54,16 @@ class PostsController {
             imageUrl
         );
 
-        res.status(updatePostData.status).json({ data: updatePostData });
+        // res.status(updatePostData.status).json({ data: updatePostData });
+        res.json({ data: updatePostData });
     };
 
     //게시글 삭제
     deletePost = async (req, res, next) => {
         const { postId } = req.params;
-        // const { deletemessage } = req.body;
 
         const deletPostData = await this.postService.deletePost(Number(postId));
-        res.status(deletPostData.status).json({ data: deletPostData });
+        res.json({ data: deletPostData });
 
     };
 }
