@@ -7,8 +7,6 @@ class PostService {
     findAllPost = async () => {
         const allPost = await this.postRepository.findAllPost();
 
-        // console.log(allPost.Locals[2].dataValues);
-
         const Posts = allPost.posts.map((post, i) => {
             const Locals = allPost.Locals;
 
@@ -17,13 +15,14 @@ class PostService {
                     title: post.title,
                     content: post.content,
                     createdAt: post.createdAt,
-                    // like: allPost.like[index],
                     songTitle: post.songTitle,
                     singer: post.singer,
 
                     nickname: allPost.Locals[i].dataValues.nickname,
                     MBTI: allPost.Locals[i].dataValues.MBTI,
                     profilePicture: allPost.Locals[i].dataValues.profilePicture,
+
+                    // like: allPost.like[index],
                 };
             }
         });
@@ -41,30 +40,45 @@ class PostService {
         const getPostData = await this.postRepository.findOnePost(postId);
 
         const Poster = {
-            nickname: getPostData.nickname,
-            title: getPostData.title,
-            content: getPostData.content,
-            info: {
-                songTitle: getPostData.songTitle,
-                singer: getPostData.singer,
+            poster: {
+                nickname: getPostData.detailPostUser["User.nickname"],
+                title: getPostData.detailPostUser.title,
+                content: getPostData.detailPostUser.content,
+                MTBI: getPostData.detailPostUser["User.MBTI"],
+                profilePicture:
+                    getPostData.detailPostUser["User.profilePicture"],
+                createdAt: getPostData.detailPostUser.createdAt,
+                like: getPostData.like,
+                imageUrl: getPostData.imageUrl,
             },
-            MTBI: getPostData.MBTI,
-            profilePicture: getPostData.profilePicture,
-            createdAt: getPostData.createdAt,
-            // like: getPostData.like,
+            info: {
+                songTitle: getPostData.detailPostUser.songTitle,
+                singer: getPostData.detailPostUser.singer,
+            },
+
+            commenter: {
+                nickname: getPostData.detailPostUser["User.nickname"],
+                content: getPostData.detailPostUser.content,
+                profilePicture:
+                    getPostData.detailPostUser["User.profilePicture"],
+                MTBI: getPostData.detailPostUser["User.MBTI"],
+                createdAt: getPostData.detailPostUser.createdAt,
+            },
         };
 
-        const commenter = {
-            nickname,
-            content,
-            profilePicture,
-            MBTI,
-            createdAt,
-        };
+        console.log(Poster);
 
+        // const commenter = {
+        //     nickname,
+        //     content,
+        //     profilePicture,
+        //     MBTI,
+        //     createdAt,
+        // };
+
+        // console.log("service", Poster);
         return {
-            Post,
-            status: 200,
+            Poster,
         };
     };
 
@@ -96,14 +110,13 @@ class PostService {
     updatePost = async (postId, title, content, imageUrl) => {
         await this.postRepository.updatePost(postId, title, content, imageUrl);
         return {
-            status: 200,
             msg: "게시물이 수정되었습니다.",
         };
     };
 
     deletePost = async (postId) => {
         await this.postRepository.deletePost(postId);
-        return { status: 200, msg: "게시물 삭제에 성공했습니다." };
+        return { msg: "게시물 삭제에 성공했습니다." };
     };
 }
 

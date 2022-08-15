@@ -1,6 +1,6 @@
-const { Like, Post, User } = require("../models");
+const { Like, Post, User, Comment } = require("../models");
 const PostService = require("../services/posts.service");
-const UserRepository = require("./sign.repository");
+const SignRepository = require("../repositories/sign.repository");
 
 class PostRepository {
     findAllPost = async () => {
@@ -13,11 +13,10 @@ class PostRepository {
             }); //locals에는 posts.userId로 찾은 user 데이터가 담겨있다.
             Locals.push(locals);
         }
-        // console.log("repo의", posts, Locals);
         return { posts, Locals };
     };
-    // const like = [];
 
+    // const like = [];
     // for (let i = 0; i < posts.length; i++) {
     //     const temp = await Like.findAll({
     //         where: { postId: posts[i].postId },
@@ -28,15 +27,37 @@ class PostRepository {
     // };
 
     findOnePost = async (postId) => {
-        const detailPost = await Post.findOne({
+        //join 사용해서
+        const detailPostUser = await Post.findOne({
             where: { postId },
-        }); //
+            include: [
+                {
+                    model: User,
+                    attributes: ["MBTI", "profilePicture", "nickname"],
+                },
+                {
+                    model: Comment,
+                    attributes: ["content", "createdAt"],
+                },
+            ],
+            attributes: [
+                "title",
+                "content",
+                "userId",
+                "songTitle",
+                "singer",
+                "createdAt",
+                "imageUrl",
+            ],
+            raw: true,
+        });
 
-        const userdetailPost = await Post.userId.findOne(
-            { profilePicture },
-            { where: userId }
-        );
-        return detailPost;
+        // await Post.userId.findOne(
+        //     { MBTI, profilePicture, nickname },
+        //     { where: userId }
+        // );
+
+        return { detailPostUser };
     };
 
     createPost = async (

@@ -13,15 +13,14 @@ class PostsController {
     //상세 게시물 조회
     getOnePost = async (req, res, next) => {
         const { postId } = req.params;
-        // const { userId } = res.locals;
 
         const postData = await this.postService.getPost(Number(postId));
-        const infoData = await this.postService.getPost(songTitle, singer);
+        // const infoData = await this.postService.getPost(songTitle, singer);
         // const commentData = await this.postService.getPost()
 
-        res.status(postData.status, infoData.status).json({
-            data: postData.Post,
-            data: infoData.Post,
+        res.json({
+            data: postData.Poster,
+            // data: infoData.Post,
         });
     };
 
@@ -39,7 +38,7 @@ class PostsController {
             userId,
             MBTI
         );
-        res.status(createPostData.status).json({ data: createPostData.msg });
+        res.json({ data: createPostData.msg });
     };
 
     //게시글 수정
@@ -54,16 +53,16 @@ class PostsController {
             imageUrl
         );
 
-        res.status(updatePostData.status).json({ data: updatePostData });
+        // res.status(updatePostData.status).json({ data: updatePostData });
+        res.json({ data: updatePostData });
     };
 
     //게시글 삭제
     deletePost = async (req, res, next) => {
         const { postId } = req.params;
-        // const { deletemessage } = req.body;
 
         const deletPostData = await this.postService.deletePost(Number(postId));
-        res.status(deletPostData.status).json({ data: deletPostData });
+        res.json({ data: deletPostData });
     };
 }
 
