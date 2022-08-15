@@ -5,10 +5,12 @@ const authMiddleware = require("../middlewares/auth-middleware");
 const PostsController = require("../controllers/posts.controller");
 const postsController = new PostsController();
 
-// 게시물 조회
+// 게시물 조회, 로그인 필요 없음
+//http://localhost:8000/post/allpost
 router.get("/allpost", postsController.getAllPosts);
 
-// 게시물 상세보기
+// 게시물 상세보기, 로그인 필요 없음
+//http://localhost:8000/post/postId
 router.get("/:postId", postsController.getOnePost);
 
 // 게시물 작성
