@@ -35,10 +35,6 @@ class PostRepository {
                     model: User,
                     attributes: ["MBTI", "profilePicture", "nickname"],
                 },
-                {
-                    model: Comment,
-                    attributes: ["content", "createdAt"],
-                },
             ],
             attributes: [
                 "title",
@@ -51,13 +47,24 @@ class PostRepository {
             ],
             raw: true,
         });
+        const detailCommentUser = await Comment.findOne({
+            where: { postId },
+            include: [
+                {
+                    model: User,
+                    attributes: ["MBTI", "nickname"],
+                },
+            ],
+            attributes: ["content", "userId", "createdAt"],
+            raw: true,
+        });
 
         // await Post.userId.findOne(
         //     { MBTI, profilePicture, nickname },
         //     { where: userId }
         // );
 
-        return { detailPostUser };
+        return { detailPostUser, detailCommentUser };
     };
 
     createPost = async (
@@ -112,7 +119,6 @@ class PostRepository {
             where: { postId },
         });
     };
-
 }
 
 module.exports = PostRepository;
