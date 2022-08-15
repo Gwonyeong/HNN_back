@@ -1,8 +1,10 @@
 const PostRepository = require("../repositories/posts.repository");
 const { all } = require("../routes/post.routes");
 
+
 class PostService {
     postRepository = new PostRepository();
+
 
     findAllPost = async () => {
         const allPost = await this.postRepository.findAllPost();
@@ -117,6 +119,7 @@ class PostService {
     deletePost = async (postId) => {
         await this.postRepository.deletePost(postId);
         return { msg: "게시물 삭제에 성공했습니다." };
+
     };
 }
 
