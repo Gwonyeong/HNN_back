@@ -1,69 +1,39 @@
-const SignService = require("../services/sign.service");
-const Joi = require("Joi");
+const { SignService } = require("../services/sign.service");
+const { UserService } = require("../services/sign.service");
 
 class SignController {
     signService = new SignService();
 
-    //비밀번호 확인: 비밀번호와 비밀번호 확인란의 값이 같으면 true
-    // 같지 않다면 false
-    checkPassword = async (password, confirmPw, email) => {
-        if (password !== confirmPw) {
-            return {
-                code: 400,
-                msg: "비밀번호가 일치하지 않습니다.",
-                success: false,
-            };
-        }
-
-        const schema = Joi.object().keys({
-            password: Joi.string()
-                .min(6)
-                .max(19)
-                .pattern(
-                    new RegExp(
-                        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
-                    )
-                )
-                .required(),
-        });
-        try {
-            // 검사시작
-            await schema.validateAsync({ password: password });
-        } catch (e) {
-            // 유효성 검사 에러
-
-            return {
-                code: 400,
-                msg: "비밀번호를 확인하세요.",
-                err: e,
-                success: false,
-            };
-        }
-        if (password.search(email) > -1) {
-            return {
-                code: 400,
-                msg: "이메일에 비밀번호가 포함됩니다.",
-                success: false,
-            };
-        }
-        return true;
-    };
     //회원가입
     //email,nickname,password,confirmPw,MBTI
     createUser = async (req, res, next) => {
         try {
             const { email, nickname, password, confirmPw, MBTI } = req.body;
-            const checkPasswordData = await this.checkPassword(
+            const checkPasswordData = await this.signService.checkPassword(
                 password,
-                confirmPw,
-                email
+                confirmPw
             );
 
-            if (checkPasswordData.success === false) {
-                //비밀번호가 같지 않다면 false 반환
-                return res.status(401).send({
+            //비밀번호가 같지 않다면 false 반환
+            if (!checkPasswordData.success) {
+                return res.send({
                     msg: checkPasswordData.msg,
                     success: false,
+                });
+            }
+            // 비밀번호 유효성 검사
+            // 1. 비밀번호는 영소대문자 + 숫자 + 특수문자 조합
+            // 2. email에 비밀번호가 포함되면 안됨.
+            const checkPasswordEffectivenessData =
+                await this.signService.checkPasswordEffectiveness(
+                    password,
+                    email
+                );
+
+            if (!checkPasswordEffectivenessData.success) {
+                return res.send({
+                    msg: checkPasswordEffectivenessData.msg,
+                    success: checkPasswordEffectivenessData.success,
                 });
             }
 
@@ -74,7 +44,7 @@ class SignController {
                 MBTI
             );
 
-            return res.status(signUpResult.status).send({
+            return res.send({
                 msg: signUpResult.msg,
                 success: signUpResult.success,
             });
@@ -83,77 +53,47 @@ class SignController {
         }
     };
 
-    //중복된 이메일 확인
+    //중복된 이메일 확인, 유효성 검사
     checkDupEmail = async (req, res, next) => {
         try {
             const { email } = req.body;
 
-            const schema = Joi.object().keys({
-                email: Joi.string().email().max(29).required(),
-            });
-            try {
-                // 검사시작
-                await schema.validateAsync({ email });
-            } catch (e) {
-                // 유효성 검사 에러
-                return res.status(400).json({
-                    code: 400,
-                    message: "이메일을 확인하세요.",
+            const checkEmailEffectivenessData =
+                await this.signService.checkEmailEffectiveness(email);
+
+            if (!checkEmailEffectivenessData.success) {
+                return res.send({
+                    msg: checkEmailEffectivenessData.msg,
+                    success: checkEmailEffectivenessData.success,
                 });
             }
 
-            //중복된 이메일이 있다면 true
-            //없다면 false
-            if ((await this.signService.checkDupEmail(email)) === false) {
-                return res.status(200).send({
-                    msg: "사용할 수 있는 이메일입니다.",
-                    success: true,
-                });
-            } else {
-                return res.status(401).send({
-                    msg: "이미 존재하는 이메일 입니다.",
-                    success: false,
-                });
-            }
+            //이메일이 중복인지 확인
+            const checkDupEmailData = await this.signService.checkDupEmail(
+                email
+            );
+
+            return res.send({
+                msg: checkDupEmailData.msg,
+                success: checkDupEmailData.success,
+            });
         } catch (err) {
             next(err);
         }
     };
 
-    //중복된 닉네임 확인
+    //중복된 닉네임 확인, 유효성 검사
     checkDupNickname = async (req, res, next) => {
         try {
             const { nickname } = req.body;
+            const checkNicknameEffectivenessData =
+                await this.signService.checkNicknameEffectiveness(nickname);
 
-            const schema = Joi.object().keys({
-                nickname: Joi.string()
-                    .min(2)
-                    .max(19)
-                    .pattern(new RegExp(/^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9]+$/))
-                    .required(),
+            return res.send({
+                msg: checkNicknameEffectivenessData.msg,
+                success: checkNicknameEffectivenessData.success,
+                err: checkNicknameEffectivenessData.err,
             });
-            try {
-                // 검사시작
-                await schema.validateAsync({ nickname });
-            } catch (e) {
-                // 유효성 검사 에러
-                return res
-                    .status(400)
-                    .json({ message: "닉네임을 확인하세요." });
-            }
-            //중복된 닉네임이 있다면 true
-            //없다면 false
-            if ((await this.signService.checkDupNickname(nickname)) === false) {
-                return res.status(200).send({
-                    msg: "사용할 수 있는 닉네임입니다.",
-                    success: true,
-                });
-            } else {
-                return res.status(401).send({
-                    msg: "이미 존재하는 닉네임입니다.",
-                    success: false,
-                });
-            }
         } catch (err) {
             next(err);
         }
@@ -166,17 +106,17 @@ class SignController {
             const { email, password } = req.body;
             const loginData = await this.signService.login(email, password);
             if (loginData.success) {
-                res.cookie("acessToken", loginData.token, {
+                res.cookie("token", loginData.token, {
                     maxAge: 1000 * 60 * 60,
                 });
                 res.cookie("refreshToken", "refresh", {
                     maxAge: 1000 * 60 * 60 * 24 * 7, //1주일 유지
                 });
-                return res.status(loginData.status).send({
+                return res.send({
                     success: loginData.success,
                 });
             } else
-                return res.status(loginData.status).send({
+                return res.send({
                     success: loginData.success,
                     msg: loginData.msg,
                 });
@@ -187,8 +127,89 @@ class SignController {
 
     //로그아웃
     logout = async (req, res, next) => {
-        await res.clearCookie("acessToken");
-        res.status(200).send({ success: true });
+        await res.clearCookie("token");
+        res.send({ success: true });
     };
 }
-module.exports = SignController;
+
+class UserController {
+    userService = new UserService();
+    //아직 테스트 해봐야 함.
+    updateUserProfile = async (req, res, next) => {
+        const { userId } = req.params;
+        const {
+            password,
+            newPassword,
+            confirmNewPassword,
+            newNickname,
+            newMBTI,
+            newProfilePicture,
+        } = req.body;
+        //입력한 비밀번호가 다른 경우
+        const checkDupPasswordData = await this.userService.checkPassword(
+            userId,
+            password
+        );
+        if (
+            !checkDupPasswordData.success ||
+            newPassword !== confirmNewPassword
+        ) {
+            return res.send({
+                msg: "비밀번호가 일치하지 않습니다.",
+                success: false,
+            });
+        }
+        //입력한 비밀번호가 현재의 비밀번호와 같은 경우
+        const checkDupNewPasswordData = await this.userService.checkPassword(
+            userId,
+            newPassword
+        );
+        if (checkDupNewPasswordData.success) {
+            return res.send({
+                msg: "기본 비밀번호와 다르게 설정해주세요.",
+                success: false,
+            });
+        }
+        //입력한 비밀번호의 유효성 검사
+        const checkEffectivenessNewPassword =
+            await this.signService.checkPasswordEffectiveness(newPassword);
+        if (!checkEffectivenessNewPassword.success) {
+            return res.send({
+                success: checkDupNewPasswordData.success,
+                msg: checkDupNewPasswordData.msg,
+            });
+        }
+        //닉네임의 유효성, 중복 확인
+        const checkNicknameData =
+            await this.signService.checkNicknameEffectiveness(newNickname);
+        if (!checkNicknameData.success) {
+            return res.send({
+                success: checkNicknameData.success,
+                msg: checkNicknameData.msg,
+            });
+        }
+        //위의 모든 조건들을 만족한다면 회원정보 업데이트
+        const updateUserProfileData = await this.userService.updateUserProfile(
+            userId,
+            newPassword,
+            newNickname,
+            newMBTI,
+            newProfilePicture
+        );
+        if (updateUserProfileData.success) {
+            return res.send({
+                success: updateUserProfileData.success,
+            });
+        }
+    };
+
+    //내가 쓴 글 보기
+    postOfLoginUser = async (req, res, next) => {
+        const {userId} = req.params;
+
+    }
+}
+module.exports = {
+    SignController,
+    UserController,
+};

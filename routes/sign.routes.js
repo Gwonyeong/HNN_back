@@ -2,9 +2,11 @@ const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/auth-middleware");
 
-const SignController = require("../controllers/sign.controller");
+const { SignController } = require("../controllers/sign.controller");
 const signController = new SignController();
 
+const { UserController } = require("../controllers/sign.controller");
+const userController = new UserController();
 // 로그인
 // 완료
 router.post("/in", signController.login);
@@ -22,6 +24,11 @@ router.post("/checkEmail", signController.checkDupEmail);
 router.post("/checkNickname", signController.checkDupNickname);
 
 //로그아웃
-//
+//완료
 router.post("/out", authMiddleware, signController.logout);
+
+//마이페이지
+router.patch("user/:userId", authMiddleware, userController.updateUserProfile);
+
+router.get("sign/user/:userId", authMiddleware, userController.postOfLoginUser)
 module.exports = router;
